@@ -55,7 +55,38 @@ def breadthFirst(gr, nsol=3):
         lSuccesori=gr.succesori(nodCurent)
         coada+=lSuccesori
 
+def depthFirstNerecursiv(gr, nsol=3):
+    stiva=[NodArbore(gr.start)]
+    while stiva:
+        nodCurent=stiva.pop()
+        if gr.scop(nodCurent.informatie):
+            print(repr(nodCurent))
+            nsol-=1
+            if not nsol:
+                return
+        lSuccesori=gr.succesori(nodCurent)
+        stiva+=lSuccesori[::-1]
+        
+def depthFirstRecursiv(gr, nsol=3):
+    def depthFirstRecursivFn(nodCurent, gr, nsol):
+        if nsol <= 0:
+            return 0
+        if gr.scop(nodCurent.informatie):
+            print(repr(nodCurent))
+            nsol -= 1
+            if nsol == 0:
+                return 0
 
+        lSuccesori = gr.succesori(nodCurent)
+        for succesor in lSuccesori:
+            nsol = depthFirstRecursivFn(succesor, gr, nsol)
+            if nsol == 0:
+                return 0
+        return nsol
+    
+    nodStart = NodArbore(gr.start)
+    depthFirstRecursivFn(nodStart, gr, nsol)
+    
 
 m = [
     [0, 1, 0, 1, 1, 0, 0, 0, 0, 0],
@@ -77,4 +108,12 @@ m = [
 start = 0
 scopuri = [5, 9]
 gr=Graf(m, start,scopuri)
+
+print('BFS')
 breadthFirst(gr,3)
+print()
+print('DFS Nerecursiv')
+depthFirstNerecursiv(gr,3)
+print()
+print('DFS recursiv')
+depthFirstRecursiv(gr,3)
