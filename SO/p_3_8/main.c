@@ -8,6 +8,11 @@
  va afisa cine este la rand, victoria sau remiza.
 */
 
+/*
+gcc -o main.o main.c -lncurses
+./main.o
+*/
+
 #include <ncurses.h>
 #include <stdlib.h>
 

@@ -8,6 +8,11 @@
  inchide si thread-ul principal.
 */
 
+/*
+gcc -o main.o main.c
+./main.o
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
