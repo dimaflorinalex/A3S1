@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "io.h": "c",
+    "usart.h": "c",
+    "usart.c": "cpp"
+  }
+}
