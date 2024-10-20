@@ -13,6 +13,7 @@
 - 2x Butoane (pentru start încărcare și stop încărcare)
 - 9x Rezistoare (7x 220 ohm, 2x 1K)
 - Breadboard
+- Arduino Uno
 - Linii de legătură
 
 ### 1.3. Detalii tehnice
