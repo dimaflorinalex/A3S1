@@ -34,6 +34,48 @@ int stopButtonLastState = HIGH; // Ultima stare stabila a butonului de stop
 unsigned long stopButtonLastDebounceTime = 0; // Timestamp last debounce pentru butonul de stop
 unsigned long stopButtonDebounceDelay = 1000; // Delay ms pentru debounce buton stop
 
+// Verifica starea butonului de start
+void checkStartButtonState() {
+  int startButtonCurrentState = digitalRead(START_BTN_PIN);
+
+  if (startButtonCurrentState != startButtonLastState) {
+    startButtonLastDebounceTime = millis();
+  }
+ 
+  if ((millis() - startButtonLastDebounceTime) > startButtonDebounceDelay) {
+    if (startButtonCurrentState != startButtonState) {
+      startButtonState = startButtonCurrentState;
+
+      if (startButtonState == LOW) {
+        shouldStartCharging = true;
+      }
+    }
+  }
+
+  startButtonLastState = startButtonCurrentState;
+}
+
+// Verifica starea butonului de stop
+void checkStopButtonState() {
+  int stopButtonCurrentState = digitalRead(STOP_BTN_PIN);
+
+  if (stopButtonCurrentState != stopButtonLastState) {
+    stopButtonLastDebounceTime = millis();
+  }
+
+  if ((millis() - stopButtonLastDebounceTime) > stopButtonDebounceDelay) {
+    if (stopButtonCurrentState != stopButtonState) {
+      stopButtonState = stopButtonCurrentState;
+
+      if (stopButtonState == LOW) {
+        shouldStopCharging = true;
+      }
+    }
+  }
+
+  stopButtonLastState = stopButtonCurrentState;
+}
+
 // Functie auxiliara pentru setarea LED-ului RGB (starea statiei)
 // Doar rosu (statie ocupata) si verde (statie libera) ne sunt utile, albastru il tinem constant oprit
 void setStateLED(int redValue, int greenValue) {
@@ -60,23 +102,11 @@ void charging() {
     digitalWrite(CHARGE_LED_PINS[i], LOW);
 
     for (int j = 0; j < 3; j++) {
-      int stopButtonCurrentState = digitalRead(STOP_BTN_PIN);
+      checkStopButtonState();
 
-      if (stopButtonCurrentState != stopButtonLastState) {
-        stopButtonLastDebounceTime = millis();
+      if (shouldStopCharging) {
+        return;
       }
-    
-      if ((millis() - stopButtonLastDebounceTime) > stopButtonDebounceDelay) {
-        if (stopButtonCurrentState != stopButtonState) {
-          stopButtonState = stopButtonCurrentState;
-
-          if (stopButtonState == LOW) {
-            return; // Iesim din procedura fortat
-          }
-        }
-      }
-
-      stopButtonLastState = stopButtonCurrentState;
 
       digitalWrite(CHARGE_LED_PINS[i], HIGH);
       delay(500);
@@ -148,23 +178,7 @@ void setup() {
 
 // Bucla operationala a sistemului
 void loop() {
-  int startButtonCurrentState = digitalRead(START_BTN_PIN);
-
-  if (startButtonCurrentState != startButtonLastState) {
-    startButtonLastDebounceTime = millis();
-  }
- 
-  if ((millis() - startButtonLastDebounceTime) > startButtonDebounceDelay) {
-    if (startButtonCurrentState != startButtonState) {
-      startButtonState = startButtonCurrentState;
-
-      if (startButtonState == LOW && !shouldStartCharging) {
-        shouldStartCharging = true;
-      }
-    }
-  }
-
-  startButtonLastState = startButtonCurrentState;
+  checkStartButtonState();
 
   if (shouldStartCharging) {
     startCharging();
