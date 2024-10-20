@@ -42,17 +42,9 @@ Led-ul pentru disponibilitate se face verde.
 Dacă oricând de la pornirea încărcării până la finalizarea acesteia este apăsat lung (min 1s) butonul de stop, încărcarea se întrerupe prin animația de final (toate led-urile clipesc de 3 ori), iar led-ul pentru disponibilitate devine verde.
 
 ## Demo
-### 1. Schema electrica
-![Poza schema electrica folosind Wokwi]([http://url/to/img.png](https://i.ibb.co/xjj6Hhq/Screenshot-2024-10-20-211252.png))
+### 1. Schema electrica si montaj
+https://ibb.co/album/Bwnqk9
 
-### 2. Montaj
-![Poza montaj](https://i.ibb.co/hmRnvMT/20241020-210341.jpg)
-![Poza montaj](https://i.ibb.co/QCtY7z1/20241020-210352.jpg)
-![Poza montaj](https://i.ibb.co/wwzYjjV/20241020-210408.jpg)
-![Poza montaj](https://i.ibb.co/5kKGvc0/20241020-210416.jpg)
-![Poza montaj](https://i.ibb.co/7tYyKf0/20241020-210434.jpg)
-![Poza montaj](https://i.ibb.co/B20KVNG/20241020-210452.jpg)
-
-### 3. Video
-[![Video Title](https://img.youtube.com/vi/Dmn_BRmJswo/0.jpg)](https://www.youtube.com/shorts/Dmn_BRmJswo)
-[[![Video Title](https://img.youtube.com/vi/zpcJAXh8cn0/0.jpg)](https://www.youtube.com/watch?v=zpcJAXh8cn0)]
+### 2. Video
+https://www.youtube.com/shorts/Dmn_BRmJswo
+https://www.youtube.com/watch?v=zpcJAXh8cn0
