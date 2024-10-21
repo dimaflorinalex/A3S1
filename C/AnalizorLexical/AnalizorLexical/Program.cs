@@ -87,50 +87,62 @@ namespace AnalizorLexical
             List<Token> tokens = new List<Token>();
             StringBuilder currentToken = new StringBuilder();
             bool insideString = false;
-            bool insideComment = false;
+            bool insideMultiLineComment = false;
+            bool insideSingleLineComment = false;
             int lineNumber = 1;
 
             for (int i = 0; i < code.Length; i++)
             {
                 char c = code[i];
 
-                if (c == '\n' && i - 1 >= 0 && code[i - 1] == '\r')
+                // Count new lines
+                if (c == '\n')
                 {
                     lineNumber++;
                 }
 
+                // Handle string literals
                 if (insideString)
                 {
                     currentToken.Append(c);
-
-                    if (c == '"')
+                    if (c == '"' && i - 1 >= 0 && code[i - 1] != '\\')
                     {
                         tokens.Add(new Token(TokenType.StringLiteral, currentToken.ToString(), lineNumber));
                         currentToken.Clear();
                         insideString = false;
                     }
-
                     continue;
                 }
 
-                if (insideComment)
+                // Handle multi-line comments
+                if (insideMultiLineComment)
                 {
+                    currentToken.Append(c);
                     if (c == '*' && i + 1 < code.Length && code[i + 1] == '/')
                     {
-                        currentToken.Append("*/");
+                        currentToken.Append('/');
                         tokens.Add(new Token(TokenType.Comment, currentToken.ToString(), lineNumber));
                         currentToken.Clear();
-                        insideComment = false;
-                        i++;
+                        insideMultiLineComment = false;
+                        i++; // Skip the next '/'
                     }
-                    else
-                    {
-                        currentToken.Append(c);
-                    }
-
                     continue;
                 }
 
+                // Handle single-line comments
+                if (insideSingleLineComment)
+                {
+                    currentToken.Append(c);
+                    if (c == '\n')
+                    {
+                        tokens.Add(new Token(TokenType.Comment, currentToken.ToString(), lineNumber - 1));
+                        currentToken.Clear();
+                        insideSingleLineComment = false;
+                    }
+                    continue;
+                }
+
+                // Skip whitespace
                 if (char.IsWhiteSpace(c))
                 {
                     if (currentToken.Length > 0)
@@ -138,10 +150,10 @@ namespace AnalizorLexical
                         ProcessToken(currentToken.ToString(), tokens, lineNumber);
                         currentToken.Clear();
                     }
-
                     continue;
                 }
 
+                // Start string literal
                 if (c == '"')
                 {
                     if (currentToken.Length > 0)
@@ -151,10 +163,10 @@ namespace AnalizorLexical
                     }
                     insideString = true;
                     currentToken.Append(c);
-
                     continue;
                 }
 
+                // Start multi-line comment
                 if (c == '/' && i + 1 < code.Length && code[i + 1] == '*')
                 {
                     if (currentToken.Length > 0)
@@ -162,13 +174,27 @@ namespace AnalizorLexical
                         ProcessToken(currentToken.ToString(), tokens, lineNumber);
                         currentToken.Clear();
                     }
-                    insideComment = true;
+                    insideMultiLineComment = true;
                     currentToken.Append("/*");
-                    i++;
-
+                    i++; // Skip the next '*'
                     continue;
                 }
 
+                // Start single-line comment
+                if (c == '/' && i + 1 < code.Length && code[i + 1] == '/')
+                {
+                    if (currentToken.Length > 0)
+                    {
+                        ProcessToken(currentToken.ToString(), tokens, lineNumber);
+                        currentToken.Clear();
+                    }
+                    insideSingleLineComment = true;
+                    currentToken.Append("//");
+                    i++; // Skip the next '/'
+                    continue;
+                }
+
+                // Operators
                 if (IsOperator(c.ToString()))
                 {
                     if (currentToken.Length > 0)
@@ -176,7 +202,7 @@ namespace AnalizorLexical
                         ProcessToken(currentToken.ToString(), tokens, lineNumber);
                         currentToken.Clear();
                     }
-
+                    // Handle double-character operators
                     if (i + 1 < code.Length && IsOperator(c.ToString() + code[i + 1].ToString()))
                     {
                         tokens.Add(new Token(TokenType.Operator, c.ToString() + code[i + 1].ToString(), lineNumber));
@@ -186,10 +212,10 @@ namespace AnalizorLexical
                     {
                         tokens.Add(new Token(TokenType.Operator, c.ToString(), lineNumber));
                     }
-
                     continue;
                 }
 
+                // Punctuation
                 if (IsPunctuation(c))
                 {
                     if (currentToken.Length > 0)
@@ -198,13 +224,13 @@ namespace AnalizorLexical
                         currentToken.Clear();
                     }
                     tokens.Add(new Token(TokenType.Punctuation, c.ToString(), lineNumber));
-
                     continue;
                 }
 
                 currentToken.Append(c);
             }
 
+            // Process the last token if any
             if (currentToken.Length > 0)
             {
                 ProcessToken(currentToken.ToString(), tokens, lineNumber);
