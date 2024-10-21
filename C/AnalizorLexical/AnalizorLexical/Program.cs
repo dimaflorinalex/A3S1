@@ -1,10 +1,16 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
-// Analizator lexical (tokenizare + identificare tip token + linia pe care se afla + lungimea lui)
-// Implementare in orice limbaj de programare, pentru orice limbaj de programare
-// De exemplu, pentru C
-// Deadline: 
+/*
+ Analizator lexical (tokenizare + identificare tip token + linia pe care se afla + lungimea lui)
+ Implementare in orice limbaj de programare, pentru orice limbaj de programare
+*/
+
+// Deadline: 23 octombrie 2024
+// Se prezinta la laborator
+
+// Analizor lexical pentru C#, scris in C#
+// Dima Florin-Alexandru - Grupa 362
 
 namespace AnalizorLexical
 {
@@ -238,7 +244,7 @@ namespace AnalizorLexical
                 return;
             }
 
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CodeSnippets", fileName);
             if (!File.Exists(filePath))
             {
                 Console.WriteLine("Fisierul nu exista");

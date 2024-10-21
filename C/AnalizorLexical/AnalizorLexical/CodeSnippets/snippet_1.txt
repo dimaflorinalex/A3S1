@@ -1,0 +1,35 @@
+using System.Text;
+
+/*
+    Snippet 1
+    Test Analizor Lexical
+*/
+
+// Dima Florin-Alexandru
+// Grupa 362
+
+namespace Snippet1
+{
+    internal class Program
+    {
+        static async Task Main(string[] args)
+        {
+            int num, a12b_34, 13aaa;
+            string x = "un string \
+                        pe mai \" multe linii ";
+            
+            Console.Write("Enter an integer: ");
+            int.TryParse(Console.ReadLine(), out num);
+
+            if (num % 2 == 0)
+            {
+                Console.WriteLine($"{num} is even.");
+            }
+            else
+            {
+                Console.WriteLine($"{num} is odd.");
+            } /* comentariu ** pe /mai
+                 multe linii  */   num++;
+        }
+    }
+}
