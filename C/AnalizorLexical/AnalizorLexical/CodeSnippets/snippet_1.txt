@@ -16,7 +16,7 @@ namespace Snippet1
         {
             int num, a12b_34, 13aaa;
             string x = "un string \
-                        pe mai \" multe linii ";
+                        pe mai \"\" multe linii ";
             
             Console.Write("Enter an integer: ");
             int.TryParse(Console.ReadLine(), out num);
