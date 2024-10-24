@@ -129,3 +129,45 @@ for sirScop in sirScopuri.split("---"):
 gr=Graf(start,scopuri)
 
 breadthFirst(gr,3)
+
+
+
+# To do
+
+# def depthFirstRec(gr,nodCurent, nsol):
+#     if gr.scop(nodCurent.informatie):
+#         print(repr(nodCurent))
+#         nsol-=1
+#         if not nsol:
+#             return 0
+#     for s in gr.succesori(nodCurent):
+#         nsol=depthFirstRec(gr,s, nsol)
+#         if not nsol:
+#             return 0
+#     return nsol
+        
+
+# def depthFirst(gr, nsol):
+#     depthFirstRec(gr, NodArbore(gr.start),nsol)
+
+
+def depthFirstRec(gr,nodCurent,pas, nsol):
+    if pas < 0:
+        return nsol
+    if gr.scop(nodCurent.informatie) and pas==0:
+        print(nsol, repr(nodCurent))
+        nsol-=1
+        if not nsol:
+            return 0
+    for s in gr.succesori(nodCurent):
+        if not nsol:
+            return 0
+        nsol=depthFirstRec(gr,s, pas-1, nsol)
+
+    return nsol
+        
+
+def depthFirstIter(gr, nsol):
+    pasMaxim=10 #depinde de problema
+    for pas in range(pasMaxim):
+        nsol=depthFirstRec(gr, NodArbore(gr.start), pas, nsol)
