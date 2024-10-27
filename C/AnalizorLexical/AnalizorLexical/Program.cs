@@ -140,24 +140,25 @@ namespace AnalizorLexical
             }
         }
 
-        // Method to check if a string is a keyword
+        // Check if string is keyword
         static bool IsKeyword(string value)
         {
             return Keywords.Any(x => x == value);
         }
 
-        // Method to check if a string is an operator
+        // Check if string is operator
         static bool IsOperator(string value)
         {
             return Operators.Any(x => x == value);
         }
 
-        // Method to check if a char is a punctuation symbol
+        // Check if char is punctuation symbol
         static bool IsPunctuation(char value)
         {
             return Punctuations.Any(x => x == value);
         }
 
+        // Tokenize code
         static List<Token> Tokenize(string code)
         {
             List<Token> tokens = new List<Token>();
@@ -187,6 +188,7 @@ namespace AnalizorLexical
                         currentToken.Clear();
                         insideString = false;
                     }
+
                     continue;
                 }
 
@@ -202,6 +204,7 @@ namespace AnalizorLexical
                         insideMultiLineComment = false;
                         i++; // Skip the next '/'
                     }
+
                     continue;
                 }
 
@@ -215,6 +218,7 @@ namespace AnalizorLexical
                         currentToken.Clear();
                         insideSingleLineComment = false;
                     }
+
                     continue;
                 }
 
@@ -226,6 +230,7 @@ namespace AnalizorLexical
                         ProcessToken(currentToken.ToString(), tokens, lineNumber);
                         currentToken.Clear();
                     }
+
                     continue;
                 }
 
@@ -237,8 +242,10 @@ namespace AnalizorLexical
                         ProcessToken(currentToken.ToString(), tokens, lineNumber);
                         currentToken.Clear();
                     }
+
                     insideString = true;
                     currentToken.Append(c);
+
                     continue;
                 }
 
@@ -253,6 +260,7 @@ namespace AnalizorLexical
                     insideMultiLineComment = true;
                     currentToken.Append("/*");
                     i++; // Skip the next '*'
+
                     continue;
                 }
 
@@ -264,9 +272,11 @@ namespace AnalizorLexical
                         ProcessToken(currentToken.ToString(), tokens, lineNumber);
                         currentToken.Clear();
                     }
+
                     insideSingleLineComment = true;
                     currentToken.Append("//");
                     i++; // Skip the next '/'
+
                     continue;
                 }
 
@@ -278,6 +288,7 @@ namespace AnalizorLexical
                         ProcessToken(currentToken.ToString(), tokens, lineNumber);
                         currentToken.Clear();
                     }
+
                     // Handle double-character operators
                     if (i + 1 < code.Length && IsOperator(c.ToString() + code[i + 1].ToString()))
                     {
@@ -288,6 +299,7 @@ namespace AnalizorLexical
                     {
                         tokens.Add(new Token(TokenType.Operator, c.ToString(), lineNumber));
                     }
+
                     continue;
                 }
 
@@ -299,7 +311,9 @@ namespace AnalizorLexical
                         ProcessToken(currentToken.ToString(), tokens, lineNumber);
                         currentToken.Clear();
                     }
+
                     tokens.Add(new Token(TokenType.Punctuation, c.ToString(), lineNumber));
+
                     continue;
                 }
 
@@ -347,6 +361,7 @@ namespace AnalizorLexical
             }
 
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CodeSnippets", fileName);
+
             if (!File.Exists(filePath))
             {
                 Console.WriteLine("Fisierul nu exista");
