@@ -78,7 +78,7 @@ def depthFirstNerecursiv(gr, nsol=3):
         lSuccesori=gr.succesori(nodCurent)
         stiva+=lSuccesori[::-1]
         
-def depthFirstRecursiv(gr, nsol=3):
+def depthFirstRecursiv(gr, nsol = 3):
     def depthFirstRecursivFn(nodCurent, gr, nsol):
         if nsol <= 0:
             return 0
@@ -101,15 +101,9 @@ def depthFirstRecursiv(gr, nsol=3):
 # Tema: Depth first iterative deepening (Cautare iterativa in adancime)
 # Tema: Formateaza frumos problema blocurilor
 
-f=open("Lab03_input.txt","r")
-continut=f.read()
-sirStart,sirScopuri=continut.split("=========")
-
-# def obtineStive(sirStive):  # "a b c" -> ["a", "b", "c"]
-#     return [ 
-#             sir.strip().split() if sir !="#" else  [] 
-#             for sir in sirStive.strip().split("\n") 
-#         ] 
+f = open("Lab03_input.txt", "r")
+continut = f.read()
+sirStart, sirScopuri = continut.split("=========")
 
 def obtineStive(sirStive):
     stiveRezultat = []
@@ -126,48 +120,29 @@ scopuri = []
 for sirScop in sirScopuri.split("---"):
     scopuri.append(obtineStive(sirScop))
 
-gr=Graf(start,scopuri)
+gr = Graf(start, scopuri)
 
-breadthFirst(gr,3)
+breadthFirst(gr, 3)
 
-
-
-# To do
-
-# def depthFirstRec(gr,nodCurent, nsol):
-#     if gr.scop(nodCurent.informatie):
-#         print(repr(nodCurent))
-#         nsol-=1
-#         if not nsol:
-#             return 0
-#     for s in gr.succesori(nodCurent):
-#         nsol=depthFirstRec(gr,s, nsol)
-#         if not nsol:
-#             return 0
-#     return nsol
-        
-
-# def depthFirst(gr, nsol):
-#     depthFirstRec(gr, NodArbore(gr.start),nsol)
-
-
-def depthFirstRec(gr,nodCurent,pas, nsol):
+def depthFirstRec(gr, nodCurent, pas, nsol):
     if pas < 0:
         return nsol
-    if gr.scop(nodCurent.informatie) and pas==0:
+    
+    if gr.scop(nodCurent.informatie) and pas == 0:
         print(nsol, repr(nodCurent))
-        nsol-=1
+        nsol -= 1
         if not nsol:
             return 0
+        
     for s in gr.succesori(nodCurent):
         if not nsol:
             return 0
-        nsol=depthFirstRec(gr,s, pas-1, nsol)
+        nsol = depthFirstRec(gr, s, pas - 1, nsol)
 
     return nsol
-        
 
-def depthFirstIter(gr, nsol):
-    pasMaxim=10 #depinde de problema
+def depthFirstIter(gr, nsol, pasMaxim):
     for pas in range(pasMaxim):
-        nsol=depthFirstRec(gr, NodArbore(gr.start), pas, nsol)
+        nsol = depthFirstRec(gr, NodArbore(gr.start), pas, nsol)
+        
+depthFirstIter(gr, 3, 5)
