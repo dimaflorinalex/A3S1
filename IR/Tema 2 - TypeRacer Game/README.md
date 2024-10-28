@@ -1,5 +1,5 @@
 # Introducere in Robotica
-## Tema de casă 1 - ⁠Sistem de încărcare a unui vehicul electric
+## Tema de casă 2 - TypeRacer Game
 ### Dima Florin-Alexandru - Grupa 362
 
 ## Detalii lucrare
