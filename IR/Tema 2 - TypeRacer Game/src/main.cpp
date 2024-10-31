@@ -1,24 +1,26 @@
 #include <Arduino.h>
 
+// RGB LED Pins
 const int rgbLedRedPin = 6;
 const int rgbLedGreenPin = 5;
 const int rgbLedBluePin = 4;
 const int rgbLedPins[] = { rgbLedRedPin, rgbLedGreenPin, rgbLedBluePin };
 
+// Buttons Pins
 const int buttonStartStopPin = 3;
 const int buttonCycleDifficultyPin = 2;
 const int buttonsPins[] = { buttonStartStopPin, buttonCycleDifficultyPin };
 
+// Buttons debouncing
 volatile unsigned long buttonCycleDifficultyLastDebounceTimeMilliseconds = 0;
 const unsigned long buttonCycleDifficultyDebounceTimeMilliseconds = 50;
 
 volatile unsigned long buttonStartStopLastDebounceTimeMilliseconds = 0;
 const unsigned long buttonStartStopDebounceTimeMilliseconds = 50;
 
-const int roundTimeMilliseconds = 30000; // 30000 ms = 30 s
-const int startGameAnimationDurationSeconds = 3;
-
-int roundTimeStartMilliseconds = 0;
+// Game constants
+const int roundTimeMilliseconds = 30000; // 30000 ms = 30 s (Round time)
+const int startGameAnimationDurationSeconds = 3; // Start Game animation (3, 2, 1 and LED blink)
 
 const int wordsCount = 50;
 const String words[wordsCount] = {
@@ -74,14 +76,6 @@ const String words[wordsCount] = {
   "scandalous"
 };
 
-String currentWord = "";
-
-volatile bool shouldCycleDifficulty = false;
-volatile bool shouldStartGame = false;
-volatile bool shouldStopGame = false;
-volatile bool isGameStarted = false;
-volatile bool shouldChangeWord = false;
-
 enum Difficulty {
   UNKNOWN = -1,
   EASY = 0,
@@ -89,17 +83,29 @@ enum Difficulty {
   HARD = 2
 };
 
+// Game state
+volatile bool shouldCycleDifficulty = false;
+volatile bool shouldStartGame = false;
+volatile bool shouldStopGame = false;
+volatile bool isGameStarted = false;
+volatile bool shouldChangeWord = false;
+
 enum Difficulty difficulty = Difficulty::UNKNOWN;
-int timePerWord = 0;
+int timePerWord = 0; // Maximum time per word. It must be correlated with difficulty. 0 is invalid, meaning that difficulty is unknown.
 
-int correctWordsCounter = 0;
+long roundTimeStartMilliseconds = 0; // Timestamp round start
+int correctWordsCounter = 0; // Score
+String currentWord = ""; // Current random word
+String inputText = ""; // Current user input
 
+// Sets values for RGB LED digital
 void setRgbLed(int redValue, int greenValue, int blueValue) {
   digitalWrite(rgbLedRedPin, redValue);
   digitalWrite(rgbLedGreenPin, greenValue);
   digitalWrite(rgbLedBluePin, blueValue);
 }
 
+// Handler for Cycle Difficulty Button
 void triggerCycleDifficulty() {
   if (millis() - buttonCycleDifficultyLastDebounceTimeMilliseconds > buttonCycleDifficultyDebounceTimeMilliseconds) {
     buttonCycleDifficultyLastDebounceTimeMilliseconds = millis();
@@ -112,6 +118,7 @@ void triggerCycleDifficulty() {
   }
 }
 
+// Handler for Cycle Difficulty Event (shouldCycleDifficulty flag)
 void cycleDifficulty() {
   shouldCycleDifficulty = false;
 
@@ -138,6 +145,7 @@ void cycleDifficulty() {
   }
 }
 
+// Handler for Start/Stop Button
 void triggerStartStopGame() {
   if (millis() - buttonStartStopLastDebounceTimeMilliseconds > buttonStartStopDebounceTimeMilliseconds) {
     buttonStartStopLastDebounceTimeMilliseconds = millis();
@@ -151,6 +159,7 @@ void triggerStartStopGame() {
   }
 }
 
+// Handler for StartGame Event (shouldStartGame flag)
 void startGame() {
   shouldStartGame = false;
 
@@ -159,9 +168,10 @@ void startGame() {
     return;
   }
 
-  isGameStarted = true;
   correctWordsCounter = 0;
+  inputText = "";
 
+  // Start game animation
   for (int i = startGameAnimationDurationSeconds; i > 0; i--) {
     Serial.println(i);
     setRgbLed(HIGH, HIGH, HIGH);
@@ -192,31 +202,32 @@ void startGame() {
   interrupts();
 
   roundTimeStartMilliseconds = millis();
+  isGameStarted = true;
   shouldChangeWord = true;
 }
 
+// ISR for timer 1 (timer for change word)
 ISR(TIMER1_COMPA_vect) {
   shouldChangeWord = true;
 }
 
+// Handler for ChangeWord Event (shouldChangeWord flag)
 void changeWord() {
   shouldChangeWord = false;
 
-  TCNT1 = 0;
+  TCNT1 = 0; // Reset change word timer
 
+  // Choose random word
   int index = random(0, wordsCount);
   currentWord = words[index];
 
+  inputText = ""; // Reset user input
+
+  Serial.print("\n\n");
   Serial.println(currentWord);
 }
 
-void stopGame() {
-  Serial.print("Score: ");
-  Serial.println(correctWordsCounter);
-
-  setInactiveState();
-}
-
+// Resets game to inactive state
 void setInactiveState() {
   setRgbLed(HIGH, HIGH, HIGH);
   difficulty = Difficulty::UNKNOWN;
@@ -228,6 +239,7 @@ void setInactiveState() {
   correctWordsCounter = 0;
   shouldChangeWord = false;
   currentWord = "";
+  inputText = "";
 
   noInterrupts();
 
@@ -247,10 +259,19 @@ void setInactiveState() {
   Serial.println("You must choose the difficulty before you can start the game.");
 }
 
+// Stops the game
+void stopGame() {
+  Serial.print("\n\nScore: ");
+  Serial.println(correctWordsCounter);
+
+  setInactiveState();
+}
+
+// Initial load
 void setup() {
   Serial.begin(115200);
 
-  randomSeed(analogRead(0));
+  randomSeed(analogRead(0)); // Sets a random seed for ensuring a random sequence of words
 
   for (int i = 0; i < 3; i++) {
     pinMode(rgbLedPins[i], OUTPUT);
@@ -266,38 +287,73 @@ void setup() {
   setInactiveState();
 }
 
+// Operational loop
 void loop() {
+  // Handle cycle difficulty
   if (shouldCycleDifficulty) {
     cycleDifficulty();
   }
 
+  // Handle start game
   if (shouldStartGame) {
     startGame();
   }
 
+  // Handle stop game
   if (shouldStopGame) {
     stopGame();
   }
 
+  // Handle actual game
   if (isGameStarted) {
+    // Handle change word
     if (shouldChangeWord) {
       changeWord();
     }
 
-    if (millis() - roundTimeStartMilliseconds >= roundTimeMilliseconds && !shouldStopGame) {
+    // Check if round should finish (time elapsed)
+    if ((millis() - roundTimeStartMilliseconds >= roundTimeMilliseconds) && !shouldStopGame) {
       shouldStopGame = true;
     }
 
+    // Handle user input
     if (Serial.available()) {
-      String input = Serial.readStringUntil('\n');
+      char c = Serial.read(); // Read character
 
-      if (input.equals(currentWord)) {
-        correctWordsCounter++;
-        shouldChangeWord = true;
-        setRgbLed(LOW, HIGH, LOW);
+      if (c == '\b') { // If character is a backspace
+        if (inputText.length() > 0) {
+          inputText.remove(inputText.length() - 1); // Remove last character in inputText (buffer for user input)
+
+          // Replace current line in terminal with spaces and then replace spaces with user input (reflection for backspace)
+          String clearText = "";
+
+          clearText += "\r";
+          for (unsigned int i = 0; i <= inputText.length(); i++) {
+            clearText += " ";
+          }
+          clearText += "\r";
+
+          Serial.print(clearText);
+          Serial.print(inputText);
+        }
       }
-      else {
-        setRgbLed(HIGH, LOW, LOW);
+      else if (c == '\n') { // Else if character is a new line
+        inputText = ""; // Clear input
+      }
+      else { // Else it is a normal character
+        inputText += c; // Append to input
+      }
+
+      if (currentWord.startsWith(inputText)) { // If current word starts with input text, then user is on the right path
+        setRgbLed(LOW, HIGH, LOW); // Turn on green LED, so the user knows that he doesn't have mistakes in his word until now
+      }
+      else { // Else user input contains mistakes (impossible to get to the current word)
+        setRgbLed(HIGH, LOW, LOW); // Turn on red LED, so the user knows that he must correct his input
+      }
+
+      if (currentWord.equals(inputText)) { // If input is correct (equals to current word)
+        correctWordsCounter++; // Increment the score
+        shouldChangeWord = true; // Request new word
       }
     }
   }
