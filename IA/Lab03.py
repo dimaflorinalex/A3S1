@@ -122,6 +122,7 @@ for sirScop in sirScopuri.split("---"):
 
 gr = Graf(start, scopuri)
 
+print('BFS')
 breadthFirst(gr, 3)
 
 def depthFirstRec(gr, nodCurent, pas, nsol):
@@ -144,5 +145,6 @@ def depthFirstRec(gr, nodCurent, pas, nsol):
 def depthFirstIter(gr, nsol, pasMaxim):
     for pas in range(pasMaxim):
         nsol = depthFirstRec(gr, NodArbore(gr.start), pas, nsol)
-        
+
+print('DFS iterativ')
 depthFirstIter(gr, 3, 5)
