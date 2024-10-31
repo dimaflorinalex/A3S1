@@ -53,7 +53,7 @@ Alte observații:
 
 ## Demo
 ### 1. Schema electrica si montaj
-- 
+- https://ibb.co/album/QrmkVq
 
 ### 2. Video
-- 
+- https://www.youtube.com/watch?v=essDIag9NNI
