@@ -1,83 +1,42 @@
 # Introducere in Robotica
-## Tema de casă 3 - Tema 3 - Quick Time
+## Tema de casă 3 - Tema 3 - Quick Time (Slave)
 ### Dima Florin-Alexandru - Grupa 362
 
 ## Detalii lucrare
 
 ### 1.1. Descriere
-În această temă, fiecare echipă va crea un joc de reflex competitiv pentru doi jucători, în care ambii participanți vor concura pentru a obține cel mai mare punctaj, testându-și viteza de reacție. Proiectul se va realiza în echipe de câte două persoane.
+Un joc de reflex competitiv adecvat pentru 2 jucatori. Ambii participanti concureaza pentru a obtine cel mai mare punctaj, testandu-si viteza de reactie.
 
-Fiecare jucător va avea butoane și LED-uri proprii, iar jocul se va desfășura în mai multe runde. Scopul fiecărui jucător este să apese cât mai rapid butonul care corespunde culorii afișate pe LED-ul RGB al echipei sale. Punctajul fiecărui jucător va fi afișat pe un ecran LCD și se va actualiza pe parcursul jocului. La finalul jocului, jucătorul cu cel mai mare punctaj este declarat câștigător.
+Fiecare jucator are 3 butoane, asociate cu 3 culori (LED rosu, verde, albastru). Scopul fiecarui jucator este sa apese cat mai rapid butonul care corespunde culorii afisate pe LED-ul RGB al echipei sale. Punctajul fiecarui jucator este afisat pe ecranul LCD si se actualizeaza pe parcursul jocului. La finalul jocului, jucatorul cu cel mai mare punctaj este castigatorul.
 
 ### 1.2. Componente
 - 6x LED-uri (2 grupuri de câte 3 leduri, în cadrul unui grup trebuie să avem culori diferite)
 - 2x LED RGB (1 pentru fiecare jucător)
 - 6x butoane (3 pentru fiecare jucător)
-- 5x Rezistoare (12x 220 ohm, 6x 1000 ohm)
+- 20x Rezistoare (20x 220 ohm)
 - 1x LCD
 - 1x servomotor
+- 1x Potentiometru
 - 2x Breadboard
 - Fire de legatura
 - 2x Arduino Uno
 
 ### 1.3. Detalii tehnice
-3.4 Detalii tehnice
-(2.5p) SPI: Tema aceasta implică foarte multe legături. Atât de multe încât un singur arduino uno nu ne oferă suficienți pini GPIO. De aceea pentru această temă este nevoie de 2 arduino uno care vor comunica folosind SPI. Arduinoul master va fi cel responsabil pentru controlul LCD-ului, servomotorului și va fi cel care ține în memorie starea jocului (ex. punctajul fiecărui jucator, ledul care trebuie să fie aprins acum, etc.). Arduino-ul slave va controla butoanele și ledurile, primind mesaje de la arduinoul master pentru a ști ce led să aprindă și trimițând înapoi mesaje despre butonul apăsat.
+- Butoane: Multiplexate pentru a reduce numarul de pini folositi de pe Arduino. Am folosit pinul analog A0 si citim valoarea analogica pentru a ne da seama care buton este cel apasat din seria de 6 butoane. In urma masuratorilor, am constatat ca o eroare de 10 unitati este adecvata pentru a identifica butoanele.
 
-(2p) Butoane:
+- SPI: Am folosit biblioteca SPI.h. Intrucat tema implica foarte multe legaturi, un singur Arduino Uno nu ne ofera suficienti pini. Astfel, am impartit functionalitatile necesare intre 2 placi Arduino Uno care comunica prin SPI (Serial Peripherical Interface). Arduino Master este responsabil pentru controlul LCD-ului, servomotorului si tine in memorie starea jocului (punctaj, LED care trebuie aprins etc - este cel care comanda jocul). Arduino Slave controleaza butoanele si LED-urile, primind mesaje prin SPI de la Arduino Master pentru a sti ce comanda trebuie efectuata, dar si pentru a trimite informatii catre Master, cum ar fi care este butonul apasat.
 
-Pentru începerea jocului butonul de start poate fi implementat în diverse moduri:
-Orice buton începe jocul
-Un anume buton începe jocul (ar trebui să fie clar pe breadboard care este acel buton care pornește jocul)• Un al 7-lea buton dedicat poate fi pus pentru pornirea jocului
-Cât timp jocul este în desfășurare butoanele trebuie să poată fi folosite doar pentru controlul jocului și să nu reseteze progresul
-Doar butoanele jucătorului din acea rundă trebuie să poată controla jocul
-Chiar și cu 2 plăci arduino nu avem suficienți pini pentru toate componentele. De aceea, putem
-multiplexa butoanele folosind rezistențe (www.youtube.com/watch?v=Y23vMfynUJ0)
+- LED-uri: Fiecare buton are asociat un LED de culoare diferita. Pe parcursul jocului acestea sunt aprinse pentru a vedea carei culoare ii corespunde fiecare buton. LED-ul RGB este aprins doar atunci cand jucatorul este la rand, iar acesta este aprins in una dintre culorile disponibile.
 
-(1p) LED-uri:
+- LCD: Am folosit biblioteca LiquidCrystal. Am setat o luminozitate constanta (100%), iar contrastul este variabil cu ajutorul potentiometrului pentru a spori vizibilitatea textului pe ecran. In ecranul principal, apare un mesaj sugestiv pentru actiunea care trebuie luata pentru a incepe jocul (apasarea oricarui buton). In timpul jocului, pe ecran apar scorurile celor 2 jucatori, iar la sfarsit apare castigatorul si scorul (sau remiza). Dupa cateva secunde de la finalul jocului, se afiseaza ecranul principal din nou.
 
-Fiecare buton are asociat un LED de o culoare diferită. Pe parcursul jocului acestea trebuie să fie aprinse pentru a vedea cărei culoare îi corespunde fiecare buton
-LED-ul rgb trebuie să se aprindă în una din cele 3 culori ale butoanelor
-LED-ul rgb trebuie să fie stins dacă nu este runda jucătorului corespunzător acelui LED
-(1p) LCD:
+- Servomotor: Am folosit biblioteca Servo.h. Servomotorul incepe de la pozitia de 0 grade si se deplaseaza astfel incat sa indica scurgerea timpului (timpul ramas din runda).
 
-Pentru controlul acestuia ne putem folosi de biblioteca LiquidCrystal
-Trebuie să aibă setată o luminozitate și un contrast suficient de bune cât să fie vizibil textul pe ecran.
-Vor fi folosiți doar pini D4-7 pentru liniile de date ale ecranului
-Pe parcursul jocului trebuie să afișeze punctajele celor 2 jucători
-(1p) Servomotor:
-
-Servomotorul va începe de la poziția de 0 grade și se va deplasa în sens antiorar pentru a indica scurgerea timpului.
-Anteție la valoarea trimisă către servo-motor. Prin biblioteca Servo.h noi trimitem la servomotor rotație absolută, nu relativă la cea curentă.
-Aveți libertatea de a decide următoarele elemente:
-
-Punctajul primit pentru un răspuns corect în funcție de viteza de reacție
-Timpul dintre runde (puteți avea un mic timp de pregătire între runde sau pot fi imediat una după cealaltă pentru o dificultatea crescută)
-Timpul întregului joc
-3.5 Bonus (până la 1p)
-Starea inițială a jocului poate să aibă diverse elemente pentru a fi mai interesantă. Câteva exemple:
-
-Animație pe LCD
-Animație din leduri
-Adăugarea unui buzzer
-Adăugarea posibilității jucătorilor de-ași introduce numele
-Buzzerul poate fi inclus pentru a a semnala răspunsurile corecte / greșite, începutul și finalul jocului sau chiar un theme song.
-
-Pentru adăugarea numelui jucătorilor se pot folosi diverse metode:
-
-Butoane și joystick-uri
-LCD-ul pentru a afișa numele care este introdus
-Interfața serial (USART)
+- Pentru fiecare raspuns corect, jucatorul primeste 1 punct. Pentru greseala, jucatorul nu este depunctat.
 
 ### 1.4. Flow
 #### Inițializare
-Jocul pornește cu afișarea unui mesaj de bun venit pe LCD. Apăsarea unui buton declanșează startul jocului.
-
-Pentru începerea jocului, butonul de start poate fi implementat într-un mod flexibil, rămânând la latitudinea studenților să aleagă una dintre următoarele variante:
-
-- în această variantă, jocul pornește la apăsarea oricărui buton.
-- Un buton specific începe jocul* - se poate desemna un buton anume, clar marcat pe breadboard, pentru a porni jocul.
-- Un al 7-lea buton dedicat* – se poate adăuga un buton suplimentar destinat exclusiv pornirii jocului.
+Jocul pornește cu afișarea unui mesaj de bun venit pe LCD. Apăsarea oricarui buton declanșează startul jocului.
 
 #### Desfășurarea Rundelor
 - Fiecare jucător are trei butoane, fiecare asociat unui LED de o culoare diferită și un al 4-lea LED RGB.
@@ -87,12 +46,12 @@ Pentru începerea jocului, butonul de start poate fi implementat într-un mod fl
 - Pe tot parcursul jocului display-ul LCD va arata punctajul fiecarui jucator
 
 #### Timpul și Finalizarea Jocului
-- Servomotorul se rotește pe parcursul jocului, indicând progresul. O rotație completă a servomotorului marchează sfârșitul jocului (voi decideti cat de repede se misca).
+- Servomotorul se rotește pe parcursul jocului, indicând progresul. O rotație completă a servomotorului marchează sfârșitul jocului.
 - La final, LCD-ul afișează numele câștigătorului și scorul final pentru câteva secunde, apoi revine la ecranul de start cu mesajul de bun venit.
 
 ## Demo
 ### 1. Schema electrica si montaj
-- To do
+- https://ibb.co/album/Jn1m5G
 
 ### 2. Video
-- To do
+- https://www.youtube.com/watch?v=mb71YiRKb2g
