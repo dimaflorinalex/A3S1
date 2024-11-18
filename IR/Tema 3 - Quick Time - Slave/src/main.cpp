@@ -121,10 +121,10 @@ void debugButtonAnalogValues() {
 
 void setup() { 
   pinMode(SS, INPUT_PULLUP);
-  pinMode(MISO, OUTPUT); // MISO or MOSI ?
+  pinMode(MISO, OUTPUT);
   pinMode(SCK, INPUT);
   SPCR |= _BV(SPE);
-  SPI.attachInterrupt();  //allows SPI interrupt
+  SPI.attachInterrupt(); //allows SPI interrupt
 
   for (int i = 0; i < 3; i++) {
     pinMode(rgbLedPinsPlayer1[i], OUTPUT);
